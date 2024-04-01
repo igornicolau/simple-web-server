@@ -1,16 +1,22 @@
+import {
+  NamePersistence,
+  singleton as namePersistence,
+} from "../persistence/NamePersistence.ts";
+
 type CreateName = {
   name: string;
 };
 
 class NameHandler {
-  private names!: string[];
+  private persistence: NamePersistence;
 
   constructor() {
-    this.names = [];
+    this.persistence = namePersistence;
   }
   public findAll(): Response {
+    const names = this.persistence.findAll();
     const body = {
-      names: this.names,
+      names,
     };
     return new Response(JSON.stringify(body), {
       status: 200,
@@ -22,7 +28,7 @@ class NameHandler {
 
   public async create(request: Request): Promise<Response> {
     let { name } = (await request.json()) as CreateName;
-    this.names.push(name);
+    this.persistence.create(name);
     return new Response(undefined, { status: 201 });
   }
 }
